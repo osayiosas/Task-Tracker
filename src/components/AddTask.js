@@ -13,9 +13,10 @@ const AddTask = ({ onAdd }) => {
 
       return;
     }
-    onAdd({text, day, reminder})
-    setText("");
-    setDay("");
+    onAdd({ text, day, reminder })
+    
+    setText(' ');
+    setDay(' ');
     setReminder(false);
   };
 

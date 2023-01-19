@@ -1,29 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Task from "./components/Task";
 import AddTask from "./components/AddTask";
+import Tasks from "./components/Tasks";
 
 const App = () => {
-  const [task, setTask] = useState([
+  const [showAddTask, setShowAddTask] = useState(false);
+
+  const [task, setTask] = useState([]);
+
+  useEffect(() =>
+  {
+    const getTasks = async () =>
     {
-      id: 1,
-      text: "Doctors Appointment",
-      day: "feb 5th at 2:30pm",
-      reminder: true,
-    },
-    {
-      id: 2,
-      text: "Working from Home",
-      day: "feb 5th at 2:30pm",
-      reminder: true,
-    },
-    {
-      id: 3,
-      text: "food Shopping",
-      day: "feb 5th at 2:30pm",
-      reminder: false,
-    },
-  ]);
+      const tasksFromSever = await fetchTasks()
+      setTask(tasksFromSever)
+    }
+    getTasks()
+  }, [])
+  
+
+  //fetch data
+
+  const fetchTasks = async () => {
+    const res = await fetch("http://localhost:5000/task");
+    const data = await res.json();
+
+    return data;
+  };
 
   //add Task
 
@@ -37,7 +41,12 @@ const App = () => {
 
   //Delet Task
 
-  const deleteTask = (id) => {
+  const deleteTask = async (id) =>
+  {
+    await fetch(`http://localhost:5000/task/${id}`, {
+      method:'DELETE'
+    })
+
     setTask(task.filter((task) => task.id !== id));
   };
 
@@ -53,8 +62,8 @@ const App = () => {
 
   return (
     <div className="container">
-      <Header title="Task Tracker" />
-      <AddTask onAdd={addTask} />
+      <Header onAdd={() => setShowAddTask(!showAddTask)} showAdd={showAddTask} title="Task Tracker" />
+      {showAddTask && <AddTask onAdd={addTask} />}
       {task.length > 0 ? (
         <Task task={task} onDelete={deleteTask} onToggle={toggleReminder} />
       ) : (
